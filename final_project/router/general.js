@@ -31,49 +31,49 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  res.send(JSON.stringify(books,null,4));
-});
+//public_users.get('/',function (req, res) {
+ // res.send(JSON.stringify(books,null,4));
+//});
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  const ISBN = req.params.isbn;
-  res.send(books[ISBN])
- });
+// public_users.get('/isbn/:isbn',function (req, res) {
+  // const ISBN = req.params.isbn;
+  // res.send(books[ISBN])
+ // });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  let ans = []
-    for(const [key, values] of Object.entries(books)){
-        const book = Object.entries(values);
-        for(let i = 0; i < book.length ; i++){
-            if(book[i][0] == 'author' && book[i][1] == req.params.author){
-                ans.push(books[key]);
-            }
-        }
-    }
-    if(ans.length == 0){
-        return res.status(300).json({message: "Author not found"});
-    }
-    res.send(ans);
-});
+//public_users.get('/author/:author',function (req, res) {
+  //let ans = []
+    //for(const [key, values] of Object.entries(books)){
+      //  const book = Object.entries(values);
+        //for(let i = 0; i < book.length ; i++){
+          //  if(book[i][0] == 'author' && book[i][1] == req.params.author){
+            //    ans.push(books[key]);
+            //}
+        //}
+    //}
+    //if(ans.length == 0){
+      //  return res.status(300).json({message: "Author not found"});
+   // }
+   // res.send(ans);
+//});
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  let ans = []
-  for(const [key, values] of Object.entries(books)){
-      const book = Object.entries(values);
-      for(let i = 0; i < book.length ; i++){
-          if(book[i][0] == 'title' && book[i][1] == req.params.title){
-              ans.push(books[key]);
-          }
-      }
-  }
-  if(ans.length == 0){
-      return res.status(300).json({message: "No book correspond to this title"});
-  }
-  res.send(ans);
-});
+// public_users.get('/title/:title',function (req, res) {
+//   let ans = []
+//   for(const [key, values] of Object.entries(books)){
+//       const book = Object.entries(values);
+//       for(let i = 0; i < book.length ; i++){
+//           if(book[i][0] == 'title' && book[i][1] == req.params.title){
+//               ans.push(books[key]);
+//           }
+//       }
+//   }
+//   if(ans.length == 0){
+//       return res.status(300).json({message: "No book correspond to this title"});
+//   }
+//   res.send(ans);
+// });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
@@ -81,7 +81,7 @@ public_users.get('/review/:isbn',function (req, res) {
   res.send(books[ISBN].reviews)
 });
 
-// Task 10 :
+// Task 10 : Get the book list available in the shop / Function
 function getBookList(){
   return new Promise((resolve,reject)=>{
     resolve(books);
@@ -91,19 +91,18 @@ function getBookList(){
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   getBookList().then(
-    (bk)=>res.send(JSON.stringify(bk, null, 4)),
-    (error) => res.send("An error has occured")
+    (book)=>res.send(JSON.stringify(book, null, 4))
   );  
 });
 
-// Task 11:
+// Task 11: Get book details based on ISBN / Function
 function getFromISBN(isbn){
-  let book_ = books[isbn];  
+  let book = books[isbn];  
   return new Promise((resolve,reject)=>{
-    if (book_) {
-      resolve(book_);
+    if (book) {
+      resolve(book);
     }else{
-      reject("This book cannot be find");
+      reject("There is no book corresponding to isbn: " + isbn);
     }    
   })
 }
@@ -112,26 +111,30 @@ function getFromISBN(isbn){
 public_users.get('/isbn/:isbn',function (req, res) {
   const isbn = req.params.isbn;
   getFromISBN(isbn).then(
-    (bk)=>res.send(JSON.stringify(bk, null, 4)),
+    (book)=>res.send(JSON.stringify(book, null, 4)),
     (error) => res.send(error)
   )
  });
 
-// Task 12:
-
-function getFromAuthor(author){
-  let output = [];
-  return new Promise((resolve,reject)=>{
-    for (var isbn in books) {
-      let book_ = books[isbn];
-      if (book_.author === author){
-        output.push(book_);
+// Task 12: Get book details based on author / Function
+function getFromAuthor(author) {
+    return new Promise((resolve) => {
+      let output = [];
+      for (var isbn in books) {
+        let book = books[isbn];
+        if (book.author === author) {
+          output.push(book);
+        }
       }
-    }
-    resolve(output);  
-  })
-}
-
+      if (output.length > 0) {
+        resolve(output);
+      } else {
+        resolve({ message: "There is no book corresponding to the author: " + author });
+      }
+    });
+  }
+  
+  
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
   const author = req.params.author;
@@ -141,19 +144,24 @@ public_users.get('/author/:author',function (req, res) {
   );
 });
 
-// Task 13:
-function getFromTitle(title){
-  let output = [];
-  return new Promise((resolve,reject)=>{
-    for (var isbn in books) {
-      let book_ = books[isbn];
-      if (book_.title === title){
-        output.push(book_);
+// Task 13: Get all books based on title / Function
+function getFromTitle(title) {
+    return new Promise((resolve) => {
+      let output = [];
+      for (var isbn in books) {
+        let book = books[isbn];
+        if (book.title === title) {
+          output.push(book);
+        }
       }
-    }
-    resolve(output);  
-  })
-}
+      if (output.length > 0) {
+        resolve(output);
+      } else {
+        resolve({ message: "There is no book corresponding to the title: " + title });
+      }
+    });
+  }
+  
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
