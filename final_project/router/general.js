@@ -17,11 +17,8 @@ const doesExist = (username)=>{
 
 
 public_users.post("/register", (req,res) => {
-  //Write your code here
   const username = req.body.username;
   const password = req.body.password;
-
-
   if (username && password) {
     if (!doesExist(username)) { 
       users.push({"username":username,"password":password});
@@ -35,21 +32,17 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-  //Write your code here
   res.send(JSON.stringify(books,null,4));
 });
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
   const ISBN = req.params.isbn;
-  
   res.send(books[ISBN])
  });
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
-  //Write your code here
   let ans = []
     for(const [key, values] of Object.entries(books)){
         const book = Object.entries(values);
@@ -67,7 +60,6 @@ public_users.get('/author/:author',function (req, res) {
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
   let ans = []
   for(const [key, values] of Object.entries(books)){
       const book = Object.entries(values);
@@ -78,14 +70,13 @@ public_users.get('/title/:title',function (req, res) {
       }
   }
   if(ans.length == 0){
-      return res.status(300).json({message: "Title not found"});
+      return res.status(300).json({message: "No book correspond to this title"});
   }
   res.send(ans);
 });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
   const ISBN = req.params.isbn;
   res.send(books[ISBN].reviews)
 });
@@ -101,12 +92,11 @@ function getBookList(){
 public_users.get('/',function (req, res) {
   getBookList().then(
     (bk)=>res.send(JSON.stringify(bk, null, 4)),
-    (error) => res.send("denied")
+    (error) => res.send("An error has occured")
   );  
 });
 
 // Task 11:
-
 function getFromISBN(isbn){
   let book_ = books[isbn];  
   return new Promise((resolve,reject)=>{
@@ -152,7 +142,6 @@ public_users.get('/author/:author',function (req, res) {
 });
 
 // Task 13:
-
 function getFromTitle(title){
   let output = [];
   return new Promise((resolve,reject)=>{
